@@ -35,6 +35,14 @@ class ChatHistory extends Map<Snowflake, ChatCompletionRequestMessage[]> {
     }
   }
 
+  // Clears the Chat history for an channel.
+  // Not called clear because it conflicts with Map#clear.
+  reset(channel: Snowflake) {
+    const record = this.get(channel);
+    if (!record) return;
+    record.length = 0;
+  }
+
   tokens(channel: Snowflake, model: TiktokenModel = "gpt-3.5-turbo-0301") {
     const encoding = encodingForModel(model);
 
