@@ -93,11 +93,11 @@ export async function chat(channel: Snowflake, message: string) {
   }
 
   console.log(
-    `Channel ${channel}` +
-      ` used ${completion.data.usage?.prompt_tokens} prompt tokens,` +
-      ` took ${completion.data.usage?.completion_tokens} tokens for completion,` +
-      ` totaling ${completion.data.usage?.total_tokens} tokens.\n` +
-      ` Channel is using ${chatHistory.tokens(channel)} tokens.`
+    `Channel ${channel} used` +
+      ` ${completion.data.usage?.prompt_tokens} prompt tokens,` +
+      ` ${completion.data.usage?.completion_tokens} completion tokens,` +
+      ` ${completion.data.usage?.total_tokens} total tokens.\n` +
+      `Channel is using ${chatHistory.tokens(channel)} tokens.`
   );
 
   return reply;
