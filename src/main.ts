@@ -5,7 +5,7 @@ import { commands, register } from "./commands";
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once(Events.ClientReady, (client) => {
-  console.log(`Ready! Logged in as ${client.user.tag}`);
+  console.log(`Logged in as ${client.user.tag}.`);
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -21,7 +21,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   await command.execute(interaction);
 });
 
-if (config.register) {
+if (config.registerCommands) {
   (async () => {
     console.log(`Registered ${await register()} commands.`);
   })();

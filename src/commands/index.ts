@@ -23,7 +23,7 @@ export async function register() {
 
   const body = [];
   for (const [, command] of await commands) {
-    body.push(command.data.toJSON());
+    body.push(command.data.toJSON?.());
   }
 
   const data = (await rest.put(
