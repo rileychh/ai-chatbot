@@ -1,7 +1,7 @@
 {
-  "extends": "@tsconfig/node-lts-strictest-esm/tsconfig.json",
+  "extends": "@tsconfig/node-lts-strictest/tsconfig.json",
   "include": ["src/**/*"],
   "compilerOptions": {
-    "module": "CommonJS"
+    "outDir": "dist"
   }
 }

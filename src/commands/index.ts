@@ -7,10 +7,15 @@ export const commands = (async () => {
   const commandFiles = await readdir(__dirname);
 
   for (const file of commandFiles) {
-    if (file != "index.ts" && file != "types.ts") {
-      const { default: command } = await import(`${__dirname}/${file}`);
-      commands.set(command.data.name, command);
-    }
+    if (
+      (file.endsWith(".ts") || file.endsWith(".js")) &&
+      !file.startsWith("index") &&
+      !file.startsWith("types")
+    )
+      if (file != "index.ts" && file != "types.ts") {
+        const { default: command } = await import(`${__dirname}/${file}`);
+        commands.set(command.data.name, command);
+      }
   }
 
   return commands;
