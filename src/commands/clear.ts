@@ -1,5 +1,5 @@
 import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { chatHistory } from "../openai";
+import { chatHistory } from "../chat";
 import type { Command } from "./types";
 
 const command: Command = {

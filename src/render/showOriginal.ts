@@ -1,5 +1,5 @@
 import type { Interaction } from "discord.js";
-import { chatHistory } from "../openai";
+import { chatHistory } from "../chat";
 
 export default async function (interaction: Interaction) {
   if (!interaction.isButton()) return;

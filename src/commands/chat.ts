@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { Command } from "./types";
-import { chat, chatHistory } from "../openai";
+import { chat, chatHistory } from "../chat";
 import { hasMath, renderMessage } from "../render";
 
 const command: Command = {
