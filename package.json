@@ -1,11 +1,11 @@
 {
   "name": "ai-chatbot",
   "scripts": {
-    "dev": "ts-node-dev --transpile-only -r dotenv/config src/main.ts",
+    "start": "cp .env dist; cd dist && node -r dotenv/config main.js",
+    "start:dev": "ts-node-dev --transpile-only -r dotenv/config src/main.ts",
+    "build": "rm -rf dist && tsc",
     "type-check": "tsc --noEmit",
-    "lint": "eslint . --ext .js,.ts",
-    "build": "tsc",
-    "preview": "cp .env dist && cd dist && node -r dotenv/config main.js"
+    "lint": "eslint . --ext .js,.ts"
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
