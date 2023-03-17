@@ -83,7 +83,7 @@ class ChatHistory extends Map<Snowflake, ChatRecord[]> {
 export const chatHistory = new ChatHistory();
 
 export async function chat(channel: Snowflake, message: string) {
-  const history = chatHistory.getChatCompletionRequestMessage(channel) ?? [];
+  const history = chatHistory.getChatCompletionRequestMessage(channel);
 
   let reply = null;
   let usage;
@@ -92,7 +92,7 @@ export async function chat(channel: Snowflake, message: string) {
       model: config.chatModel,
       messages: [
         { role: "system", content: config.systemMessage },
-        ...history,
+        ...(history ?? []),
         { role: "user", content: message },
       ],
       max_tokens: 350, // TODO figure out discord 2000 character limit
