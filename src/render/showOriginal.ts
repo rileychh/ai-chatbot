@@ -10,5 +10,8 @@ export default async function (interaction: Interaction) {
       ?.find((record) => record.id == interaction.message.id)?.content ??
     "Sorry, I forgot what the original text is.";
 
-  interaction.reply({ content, ephemeral: true });
+  interaction.reply({
+    content: "```md\n" + content + "\n```", // Wrap in code block
+    ephemeral: true,
+  });
 }
