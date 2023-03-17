@@ -28,11 +28,13 @@ RUN apt-get update \
   && sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
   && apt-get update \
   && apt-get install google-chrome-stable -y --no-install-recommends \
+  && apt-get install fonts-noto -y \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY package.json ./
+COPY package.json .env ./
 
 EXPOSE 80
 CMD [ "pnpm", "start" ]
+
