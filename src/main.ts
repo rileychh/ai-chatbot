@@ -1,8 +1,16 @@
 import { Client, Events, GatewayIntentBits } from "discord.js";
 import config from "./config";
 import { commands, register } from "./commands";
+import mentionChat from "./mentionChat";
+import showOriginal from "./render/showOriginal";
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
 
 client.once(Events.ClientReady, (client) => {
   console.log(`Logged in as ${client.user.tag}.`);
@@ -20,6 +28,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   await command.execute(interaction);
 });
+
+client.on(Events.MessageCreate, mentionChat);
+client.on(Events.InteractionCreate, showOriginal);
 
 if (config.registerCommands) {
   (async () => {

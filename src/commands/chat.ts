@@ -1,25 +1,7 @@
-import { AttachmentBuilder, SlashCommandBuilder } from "discord.js";
-import nodeHtmlToImage from "node-html-to-image";
-import MarkdownIt from "markdown-it";
-// @ts-expect-error @iktakahiro/markdown-it-katex Has no types
-import MarkdownItKatex from "@iktakahiro/markdown-it-katex";
+import { SlashCommandBuilder } from "discord.js";
 import type { Command } from "./types";
-import { readFile } from "fs/promises";
-import { chat } from "../openai";
-
-async function markdownToImage(markdown: string) {
-  const md = new MarkdownIt();
-  md.use(MarkdownItKatex);
-  const renderedBody = md.render(markdown);
-
-  return (await nodeHtmlToImage({
-    html: (await readFile("src/math.handlebars")).toString(),
-    content: {
-      body: renderedBody,
-    },
-    selector: "#contents",
-  })) as Buffer;
-}
+import { chat, chatHistory } from "../openai";
+import { hasMath, renderMessage } from "../render";
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -34,31 +16,40 @@ const command: Command = {
   async execute(interaction) {
     if (!interaction.isChatInputCommand()) return;
 
-    const message = interaction.options.getString("message");
-    if (!message) {
+    const content = interaction.options.getString("message");
+    if (!content) {
       console.error("/chat: No message provided.");
       return;
     }
 
     interaction.deferReply();
-    const reply = await chat(interaction.channelId, message);
+    const reply = await chat(interaction.channelId, content);
 
-    if (reply == undefined) {
+    if (!reply) {
       interaction.editReply("Sorry, an error has occurred.");
       return;
     }
 
     // If reply contains math, render the reply into image.
-    if (/\${1,2}.*?\${1,2}/g.test(reply)) {
+    let replyMessage;
+    if (hasMath(reply)) {
       await interaction.editReply("Rendering math...");
-      const img = await markdownToImage(reply);
-      await interaction.editReply({
-        content: "",
-        files: [new AttachmentBuilder(img)],
-      });
+      replyMessage = await interaction.editReply(await renderMessage(reply));
     } else {
-      await interaction.editReply(reply);
+      replyMessage = await interaction.editReply(reply);
     }
+
+    chatHistory.push(interaction.channelId, [
+      {
+        role: "user",
+        content: content,
+      },
+      {
+        id: replyMessage.id,
+        role: "assistant",
+        content: reply,
+      },
+    ]);
   },
 };
 

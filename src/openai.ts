@@ -3,6 +3,7 @@ import {
   encoding_for_model as encodingForModel,
   TiktokenModel,
 } from "@dqbd/tiktoken";
+import { omit } from "lodash";
 import type { ChatCompletionRequestMessage } from "openai";
 import type { Snowflake } from "discord.js";
 import config from "./config";
@@ -14,24 +15,30 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 export default openai;
 
+interface ChatRecord extends ChatCompletionRequestMessage {
+  id?: Snowflake;
+}
+
 // A map from channel ID to chat messages.
-class ChatHistory extends Map<Snowflake, ChatCompletionRequestMessage[]> {
-  push(channel: Snowflake, user: string, assistant: string) {
+class ChatHistory extends Map<Snowflake, ChatRecord[]> {
+  getChatCompletionRequestMessage(
+    channel: Snowflake
+  ): ChatCompletionRequestMessage[] | undefined {
+    return this.get(channel)?.map((record) => omit(record, "id"));
+  }
+
+  push(channel: Snowflake, entries: ChatRecord[]) {
     const record = this.get(channel);
-    const entry: ChatCompletionRequestMessage[] = [
-      { role: "user", content: user },
-      { role: "assistant", content: assistant },
-    ];
 
     if (record) {
-      record.push(...entry);
+      record.push(...entries);
 
       // Remove the oldest entry until history is within limit
       while (this.tokens(channel) > config.historyTokenLimit) {
         record.shift();
       }
     } else {
-      this.set(channel, entry);
+      this.set(channel, entries);
     }
   }
 
@@ -76,28 +83,36 @@ class ChatHistory extends Map<Snowflake, ChatCompletionRequestMessage[]> {
 export const chatHistory = new ChatHistory();
 
 export async function chat(channel: Snowflake, message: string) {
-  const history = chatHistory.get(channel) ?? [];
+  const history = chatHistory.getChatCompletionRequestMessage(channel) ?? [];
 
-  const completion = await openai.createChatCompletion({
-    model: config.chatModel,
-    messages: [
-      { role: "system", content: config.systemMessage },
-      ...history,
-      { role: "user", content: message },
-    ],
-  });
+  let reply = null;
+  let usage;
+  try {
+    const completion = await openai.createChatCompletion({
+      model: config.chatModel,
+      messages: [
+        { role: "system", content: config.systemMessage },
+        ...history,
+        { role: "user", content: message },
+      ],
+      max_tokens: 350, // TODO figure out discord 2000 character limit
+    });
 
-  const reply = completion.data.choices[0]?.message?.content;
-  if (reply) {
-    chatHistory.push(channel, message, reply);
+    reply = completion.data.choices[0]?.message?.content ?? null;
+    usage = completion.data.usage;
+  } catch (error) {
+    if ("message" in error) {
+      console.error(`openai.ts: ${error.message}`);
+      return `OpenAI returned an error: ${error.message}`;
+    }
+    return null;
   }
 
   console.log(
-    `Channel ${channel} used` +
-      ` ${completion.data.usage?.prompt_tokens} prompt tokens,` +
-      ` ${completion.data.usage?.completion_tokens} completion tokens,` +
-      ` ${completion.data.usage?.total_tokens} total tokens.\n` +
-      `Channel is using ${chatHistory.tokens(channel)} tokens.`
+    ` ${usage?.prompt_tokens} tokens ` +
+      `-> ${usage?.completion_tokens} tokens ` +
+      `= ${usage?.total_tokens} tokens ` +
+      `in Channel ${channel}`
   );
 
   return reply;
