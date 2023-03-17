@@ -1,0 +1,24 @@
+# Add pnpm to base image
+FROM node:18-alpine as base
+RUN npm install --global pnpm
+
+
+FROM base as build
+WORKDIR /usr/src/app
+
+# Install app dependencies and build
+COPY ./ ./
+RUN pnpm install
+RUN pnpm build
+RUN pnpm prune --prod
+
+
+FROM base as deploy
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY package.json .env ./
+
+EXPOSE 80
+CMD [ "pnpm", "start" ]

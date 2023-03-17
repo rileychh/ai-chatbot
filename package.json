@@ -2,8 +2,8 @@
   "name": "ai-chatbot",
   "scripts": {
     "start": "cp .env dist; cd dist && node -r dotenv/config main.js",
-    "start:dev": "ts-node-dev --transpile-only -r dotenv/config src/main.ts",
-    "build": "rm -rf dist && tsc",
+    "dev": "ts-node-dev --transpile-only -r dotenv/config src/main.ts",
+    "build": "rm -rf dist; tsc",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .js,.ts"
   },
