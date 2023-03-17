@@ -21,11 +21,17 @@ export async function markdownToImage(markdown: string) {
   const renderedBody = md.render(markdown);
 
   return (await nodeHtmlToImage({
-    html: (await readFile("src/render/math.handlebars")).toString(),
+    html: (await readFile(`${__dirname}/math.handlebars`)).toString(),
     content: {
       body: renderedBody,
     },
     selector: "#contents",
+    puppeteerArgs: {
+      ...(process.env.DOCKER && {
+        executablePath: "/usr/bin/google-chrome",
+        args: ["--no-sandbox"],
+      }),
+    },
   })) as Buffer;
 }
 

@@ -3,7 +3,7 @@
   "scripts": {
     "start": "cp .env dist; cd dist && node -r dotenv/config main.js",
     "dev": "ts-node-dev --transpile-only -r dotenv/config src/main.ts",
-    "build": "rm -rf dist; tsc",
+    "build": "rm -rf dist; tsc && cp src/render/math.handlebars dist/render",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .js,.ts"
   },
