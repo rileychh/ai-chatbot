@@ -8,13 +8,6 @@ import type { ChatCompletionRequestMessage } from "openai";
 import type { Snowflake } from "discord.js";
 import config from "./config";
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const openai = new OpenAIApi(configuration);
-export default openai;
-
 interface ChatRecord extends ChatCompletionRequestMessage {
   id?: Snowflake;
 }
@@ -80,6 +73,12 @@ class ChatHistory extends Map<Snowflake, ChatRecord[]> {
   }
 }
 
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+export default openai;
+
 export const chatHistory = new ChatHistory();
 
 export async function chat(channel: Snowflake, message: string) {
@@ -101,7 +100,7 @@ export async function chat(channel: Snowflake, message: string) {
     reply = completion.data.choices[0]?.message?.content ?? null;
     usage = completion.data.usage;
   } catch (error) {
-    if ("message" in error) {
+    if (error instanceof Error && "message" in error) {
       console.error(`openai.ts: ${error.message}`);
       return `OpenAI returned an error: ${error.message}`;
     }
