@@ -10,6 +10,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
 } from "discord.js";
+import { join } from "path";
 
 export function hasMath(message: string) {
   return /\${1,2}.*?\${1,2}/g.test(message);
@@ -21,7 +22,7 @@ export async function markdownToImage(markdown: string) {
   const renderedBody = md.render(markdown);
 
   return (await nodeHtmlToImage({
-    html: (await readFile(`${__dirname}/math.handlebars`)).toString(),
+    html: (await readFile(join(__dirname, "math.handlebars"))).toString(),
     content: {
       body: renderedBody,
     },

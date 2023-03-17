@@ -1,6 +1,7 @@
 import type { Command } from "./types";
 import { readdir } from "fs/promises";
 import { ApplicationCommand, REST, Routes } from "discord.js";
+import { join } from "path";
 
 export const commands = (async () => {
   const commands = new Map<string, Command>();
@@ -13,7 +14,7 @@ export const commands = (async () => {
       !file.startsWith("types")
     )
       if (file != "index.ts" && file != "types.ts") {
-        const { default: command } = await import(`${__dirname}/${file}`);
+        const { default: command } = await import(join(__dirname, file));
         commands.set(command.data.name, command);
       }
   }
