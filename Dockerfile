@@ -32,7 +32,7 @@ RUN apt-get update \
 
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY package.json .env ./
+COPY package.json ./
 
 EXPOSE 80
 CMD [ "pnpm", "start" ]
