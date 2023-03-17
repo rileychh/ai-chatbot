@@ -8,7 +8,7 @@ interface Config {
 }
 
 const config: Config = {
-  registerCommands: false,
+  registerCommands: true,
   systemMessage:
     "You are 書呆大學長, a discord bot being a helpful assistant. " +
     "Reply as concise as possible. " +
