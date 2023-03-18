@@ -7,15 +7,17 @@ import { hasMath, renderMessage } from "./render";
 export default async function (message: Message) {
   if (!message.client.user) return;
   if (message.author.id == message.client.user.id) return; // Don't reply to self
+  if (!message.mentions.has(message.client.user, { ignoreEveryone: true }))
+    return;
 
-  // The chat input is the message after the last bot mention.
-  // message.content: "@friend Let's ask the bot. @bot What is foo?"
-  // chatMessage: "What is foo?"
-  const chatMessage = message.content
-    .split(`<@&${message.client.user.id}>`)
-    .at(-1)
-    ?.trim();
-  if (!chatMessage) return; // Ignore empty messages
+  // The chat input is the message without the bot mention
+  // Before: "@friend Let's ask the bot. @bot What is foo?"
+  // After: "@friend Let's ask the bot. What is foo?"
+  // Before: "I'm not sure, @friend. What is foo? @bot"
+  // After: "I'm not sure, @friend. What is foo?"
+  const botId = message.client.user.id;
+  const botMentionPattern = new RegExp(String.raw`\s*<@!?(${botId})>\s*`, "g");
+  const chatMessage = message.content.replace(botMentionPattern, "");
 
   // Make the bot typing while we wait for the reply.
   await message.channel.sendTyping();
