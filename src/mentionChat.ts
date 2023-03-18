@@ -6,7 +6,7 @@ import { hasMath, renderMessage } from "./render";
 
 export default async function (message: Message) {
   if (!message.client.user) return;
-  if (!message.mentions.has(message.client.user)) return;
+  if (message.author.id == message.client.user.id) return; // Don't reply to self
 
   // The chat input is the message after the last bot mention.
   // message.content: "@friend Let's ask the bot. @bot What is foo?"
