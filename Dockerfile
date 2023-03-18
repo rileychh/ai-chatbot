@@ -37,4 +37,3 @@ COPY package.json .env ./
 
 EXPOSE 80
 CMD [ "pnpm", "start" ]
-
