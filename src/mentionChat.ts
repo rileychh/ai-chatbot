@@ -18,6 +18,7 @@ export default async function (message: Message) {
   const botId = message.client.user.id;
   const botMentionPattern = new RegExp(String.raw`\s*<@!?(${botId})>\s*`, "g");
   const chatMessage = message.content.replace(botMentionPattern, "");
+  console.log(`Mention chat message: ${chatMessage}`);
 
   // Make the bot typing while we wait for the reply.
   await message.channel.sendTyping();

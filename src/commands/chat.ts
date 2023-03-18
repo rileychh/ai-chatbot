@@ -21,6 +21,7 @@ const command: Command = {
       console.error("/chat: No message provided.");
       return;
     }
+    console.log(`Command chat message: ${content}`);
 
     interaction.deferReply();
     const reply = await chat(interaction.channelId, content);
