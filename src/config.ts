@@ -14,7 +14,7 @@ const config: Config = {
     "Reply as concise as possible. " +
     "Write mathematical expressions in KaTeX functions. " +
     "Answer Chinese messages in Taiwanese Mandarin.",
-  historyTokenLimit: 4096,
+  historyTokenLimit: 2048, // Recommend: 2048, max: 4096
   chatModel: "gpt-3.5-turbo",
 };
 
