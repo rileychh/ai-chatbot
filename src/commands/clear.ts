@@ -4,10 +4,10 @@ import type { Command } from "./types";
 
 const command: Command = {
   data: new SlashCommandBuilder()
-    .setName("clear")
-    .setDescription("Clears the chat history.")
+    .setName("清除")
+    .setDescription("清除頻道的對話記錄")
     .addChannelOption((option) =>
-      option.setName("channel").setDescription("The channel to clear")
+      option.setName("頻道").setDescription("要清除的頻道，預設是現在的頻道。")
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
   async execute(interaction) {
@@ -19,7 +19,7 @@ const command: Command = {
     chatHistory.reset(channel);
 
     await interaction.reply({
-      content: `Cleared <#${channel}>.`,
+      content: `已清除<#${channel}>。`,
       ephemeral: true,
     });
   },

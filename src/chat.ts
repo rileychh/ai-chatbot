@@ -81,7 +81,10 @@ export const api = openai;
 
 export const chatHistory = new ChatHistory();
 
-export async function chat(channel: Snowflake, message: string) {
+export async function chat(
+  channel: Snowflake,
+  message: string
+): Promise<string> {
   const history = chatHistory.getChatCompletionRequestMessage(channel);
 
   let reply = null;
@@ -102,9 +105,9 @@ export async function chat(channel: Snowflake, message: string) {
   } catch (error) {
     if (error instanceof Error && "message" in error) {
       console.error(`openai.ts: ${error.message}`);
-      return `OpenAI returned an error: ${error.message}`;
+      return `OpenAI 傳回了一個錯誤： ${error.message}`;
     }
-    return null;
+    return "發生了不明的錯誤，請再試一次。";
   }
 
   console.log(
@@ -114,5 +117,5 @@ export async function chat(channel: Snowflake, message: string) {
       `in Channel ${channel}`
   );
 
-  return reply;
+  return reply ?? "OpenAI 沒有傳回資料，請再試一次。";
 }

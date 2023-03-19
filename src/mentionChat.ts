@@ -29,11 +29,6 @@ export default async function (message: Message) {
   const reply = await chat(message.channelId, chatMessage);
   clearInterval(typing);
 
-  if (!reply) {
-    await message.reply("Sorry, an error has occurred.");
-    return;
-  }
-
   const channelMessages = await message.channel.messages.fetch({ limit: 1 });
   const isLastMessage = channelMessages.last()?.id == message.id;
   const replyMethod = (content: string | BaseMessageOptions) =>
