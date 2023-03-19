@@ -18,10 +18,7 @@ const command: Command = {
 
     chatHistory.reset(channel);
 
-    await interaction.reply({
-      content: `已清除<#${channel}>。`,
-      ephemeral: true,
-    });
+    await interaction.reply(`已清除<#${channel}>。`);
   },
 };
 
