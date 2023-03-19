@@ -14,7 +14,7 @@ const command: Command = {
     if (!interaction.isChatInputCommand()) return;
 
     const channel =
-      interaction.options.getChannel("channel")?.id ?? interaction.channelId;
+      interaction.options.getChannel("頻道")?.id ?? interaction.channelId;
 
     chatHistory.reset(channel);
 
