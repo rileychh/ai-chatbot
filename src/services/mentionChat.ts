@@ -1,8 +1,8 @@
 // Chat with the bot by mentioning.
 
 import type { BaseMessageOptions, Message } from "discord.js";
-import { chat, chatHistory } from "./chat";
-import { hasMath, renderMessage } from "./render";
+import { chat, chatHistory } from "../chat";
+import { hasMath, renderMessage } from "../render";
 
 export default async function (message: Message) {
   if (!message.client.user) return;

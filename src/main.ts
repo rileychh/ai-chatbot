@@ -1,8 +1,8 @@
 import { Client, Events, GatewayIntentBits } from "discord.js";
 import config from "./config";
 import { commands, register } from "./commands";
-import mentionChat from "./mentionChat";
-import showOriginal from "./render/showOriginal";
+import mentionChat from "./services/mentionChat";
+import showOriginal from "./services/showOriginal";
 
 const client = new Client({
   intents: [
