@@ -5,13 +5,13 @@ import { chat, chatHistory } from "../chat";
 import { hasMath, renderMessage } from "../render";
 
 // Array of channels to automatically reply to.
-export const directChannels: Snowflake[] = [];
+export const directChannels: Set<Snowflake> = new Set();
 
 export default async function (message: Message) {
   const { author, client, channel, id, content } = message;
 
   if (author.id == client.user.id) return; // Don't reply to self
-  if (!(channel.isDMBased() || directChannels.includes(channel.id))) return;
+  if (!(channel.isDMBased() || directChannels.has(channel.id))) return;
 
   channel.sendTyping();
   const typing = setInterval(async () => {

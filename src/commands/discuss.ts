@@ -56,7 +56,7 @@ const command: Command = {
       { id: message.id, role: "user", content: message.content },
       { id: replyMessage.id, role: "assistant", content: reply },
     ]);
-    directChannels.push(thread.id);
+    directChannels.add(thread.id);
 
     await interaction.editReply("已經在討論串回答你了，開始討論吧！");
   },
