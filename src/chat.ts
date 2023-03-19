@@ -82,10 +82,12 @@ export const api = openai;
 export const chatHistory = new ChatHistory();
 
 export async function chat(
-  channel: Snowflake,
-  message: string
+  message: string,
+  channel?: Snowflake
 ): Promise<string> {
-  const history = chatHistory.getChatCompletionRequestMessage(channel);
+  const history = channel
+    ? chatHistory.getChatCompletionRequestMessage(channel)
+    : [];
 
   let reply = null;
   let usage;
@@ -120,4 +122,14 @@ export async function chat(
   );
 
   return reply ?? "OpenAI 沒有傳回資料，請再試一次。";
+}
+
+export async function getTitle(
+  channel: Snowflake,
+  topic: string
+): Promise<string> {
+  return chat(
+    "為這個話題下簡短的標題，只需要回答我標題。 `" + topic + "`",
+    channel
+  );
 }

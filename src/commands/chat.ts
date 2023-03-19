@@ -20,7 +20,7 @@ const command: Command = {
     console.log(`Command chat message: ${content}`);
 
     interaction.deferReply();
-    const reply = await chat(interaction.channelId, content);
+    const reply = await chat(content, interaction.channelId);
 
     // If reply contains math, render the reply into image.
     let replyMessage;

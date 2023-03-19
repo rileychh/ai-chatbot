@@ -26,8 +26,7 @@ export default async function (message: Message) {
     await message.channel.sendTyping();
   }, 10000);
 
-  const reply = await chat(message.channelId, chatMessage);
-  clearInterval(typing);
+  const reply = await chat(chatMessage, message.channelId);
 
   const channelMessages = await message.channel.messages.fetch({ limit: 1 });
   const isLastMessage = channelMessages.last()?.id == message.id;
@@ -41,6 +40,7 @@ export default async function (message: Message) {
   } else {
     replyMessage = await replyMethod(reply);
   }
+  clearInterval(typing);
 
   chatHistory.push(message.channelId, [
     {
