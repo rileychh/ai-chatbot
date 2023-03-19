@@ -1,14 +1,17 @@
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { Client, Events, GatewayIntentBits, Partials } from "discord.js";
 import config from "./config";
 import { commands, register } from "./commands";
 import mentionChat from "./services/mentionChat";
 import showOriginal from "./services/showOriginal";
+import exclusiveChat from "./services/directChat";
 
 const client = new Client({
+  partials: [Partials.Channel],
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.DirectMessages,
   ],
   allowedMentions: { parse: [] },
 });
@@ -18,7 +21,7 @@ client.once(Events.ClientReady, (client) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
+  if (!interaction.isCommand()) return;
 
   const command = (await commands).get(interaction.commandName);
 
@@ -31,6 +34,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 client.on(Events.MessageCreate, mentionChat);
+client.on(Events.MessageCreate, exclusiveChat);
 client.on(Events.InteractionCreate, showOriginal);
 
 if (config.registerCommands) {

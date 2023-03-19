@@ -1,39 +1,30 @@
-// Chat with the bot by mentioning.
+// Chat with the bot without mentioning in DM or select channels.
 
 import type { BaseMessageOptions, Message, Snowflake } from "discord.js";
 import { chat, chatHistory } from "../chat";
 import { hasMath, renderMessage } from "../render";
 
-export function removeMention(id: Snowflake, content: string): string {
-  const mentionPattern = new RegExp(String.raw`\s*<@!?(${id})>\s*`, "g");
-  return content.replace(mentionPattern, "");
-}
+// Array of channels to automatically reply to.
+export const directChannels: Snowflake[] = [];
 
 export default async function (message: Message) {
-  const { client, author, mentions, content, channel, id } = message;
+  const { author, client, channel, id, content } = message;
 
-  if (!client.user) return;
   if (author.id == client.user.id) return; // Don't reply to self
-  if (!mentions.has(client.user, { ignoreEveryone: true })) return;
+  if (!(channel.isDMBased() || directChannels.includes(channel.id))) return;
 
-  // The chat input is the message without the bot mention
-  const chatMessage = removeMention(client.user.id, content);
-  console.log(`Mention chat message: ${chatMessage}`);
-
-  // Make the bot typing while we wait for the reply.
-  await channel.sendTyping();
+  channel.sendTyping();
   const typing = setInterval(async () => {
-    await channel.sendTyping();
+    await message.channel.sendTyping();
   }, 10000);
 
-  const reply = await chat(chatMessage, channel.id);
-  
+  const reply = await chat(content, channel.id);
+
   const channelMessages = await channel.messages.fetch({ limit: 1 });
   const isLastMessage = channelMessages.last()?.id == id;
   const replyMethod = (content: string | BaseMessageOptions) =>
     isLastMessage ? channel.send(content) : message.reply(content);
 
-  // If reply contains math, render the reply into image.
   let replyMessage;
   if (hasMath(reply)) {
     replyMessage = await replyMethod(await renderMessage(reply));
