@@ -43,7 +43,7 @@ export async function renderMessage(
   const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId("showOriginal")
-      .setLabel("Show original")
+      .setLabel("顯示原文")
       .setStyle(ButtonStyle.Secondary)
   );
 
