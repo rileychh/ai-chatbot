@@ -97,7 +97,9 @@ export async function chat(
         ...(history ?? []),
         { role: "user", content: message },
       ],
-      // max_tokens: 350, // TODO figure out discord 2000 character limit
+      temperature: 0.7,
+      presence_penalty: 1,
+      frequency_penalty: 1,
     });
 
     reply = completion.data.choices[0]?.message?.content ?? null;
