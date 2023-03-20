@@ -28,8 +28,11 @@ const command: Command = {
       thread = message.thread as ThreadChannel;
     } else {
       thread = await channel.threads.create({
-        name: await getTitle(channel.id, message.content),
+        name: "和學長討論",
         startMessage: message.id,
+      });
+      getTitle(channel.id, message.content).then((title) => {
+        thread.setName(title);
       });
     }
 
