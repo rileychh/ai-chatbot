@@ -82,6 +82,13 @@ export const api = openai;
 
 export const chatHistory = new ChatHistory();
 
+function truncate(string: string, length: number): string {
+  if (typeof string != "string") return string;
+  if (string.length > length) return `${string.substring(0, length - 1)}…`;
+
+  return string;
+}
+
 export async function chat(
   message: string,
   channel?: Snowflake
@@ -132,16 +139,20 @@ export async function chat(
       `in Channel ${channel}`
   );
 
-  return reply ?? "OpenAI 沒有傳回資料，請再試一次。";
+  reply = reply ?? "OpenAI 沒有傳回資料，請再試一次。";
+  return truncate(reply, 2000);
 }
 
 export async function getTitle(
   channel: Snowflake,
   topic: string
 ): Promise<string> {
-  return chat(
-    `「${topic}」\n---\n為這個話題下非常簡短的標題，只回答我標題。`,
-    channel
+  return truncate(
+    await chat(
+      `「${topic}」\n---\n為這個話題下非常簡短的標題，只回答我標題。`,
+      channel
+    ),
+    100
   );
 }
 
