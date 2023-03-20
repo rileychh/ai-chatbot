@@ -144,3 +144,10 @@ export async function getTitle(
     channel
   );
 }
+
+export async function getSummery(
+  channel: Snowflake,
+  article: string
+): Promise<string> {
+  return chat(`「${article}」\n---\n總結這篇文章。`, channel);
+}
