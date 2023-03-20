@@ -7,6 +7,7 @@ import { omit } from "lodash";
 import type { ChatCompletionRequestMessage } from "openai";
 import type { Snowflake } from "discord.js";
 import config from "./config";
+import { isAxiosError } from "axios";
 
 interface ChatRecord extends ChatCompletionRequestMessage {
   id?: Snowflake;
@@ -89,30 +90,37 @@ export async function chat(
     ? chatHistory.getChatCompletionRequestMessage(channel)
     : [];
 
-  let reply = null;
+  // Keep trying until success or tried 3 times
+  let reply;
   let usage;
-  try {
-    const completion = await openai.createChatCompletion({
-      model: config.chatModel,
-      messages: [
-        { role: "system", content: config.systemMessage },
-        ...(history ?? []),
-        { role: "user", content: message },
-      ],
-      temperature: 0.7,
-      presence_penalty: 1,
-      frequency_penalty: 1,
-    });
+  let error = null;
+  let tries = 0;
+  do {
+    error = null;
+    try {
+      const completion = await openai.createChatCompletion({
+        model: config.chatModel,
+        messages: [
+          { role: "system", content: config.systemMessage },
+          ...(history ?? []),
+          { role: "user", content: message },
+        ],
+        temperature: 0.7,
+      });
 
-    reply = completion.data.choices[0]?.message?.content ?? null;
-    usage = completion.data.usage;
-  } catch (error) {
-    if (error instanceof Error && "message" in error) {
-      console.error(`openai.ts: ${error.message}`);
-      return `OpenAI 傳回了一個錯誤： ${error.message}`;
+      reply = completion.data.choices[0]?.message?.content ?? null;
+      usage = completion.data.usage;
+    } catch (e) {
+      error = e;
+      if (isAxiosError(e)) {
+        console.error(`openai.ts: ${e.message}`);
+        reply = `OpenAI 傳回了一個錯誤： ${e.message}`;
+      } else {
+        console.error(`openai.ts: ${e}`);
+        reply = "發生了不明的錯誤，請再試一次。";
+      }
     }
-    return "發生了不明的錯誤，請再試一次。";
-  }
+  } while (error != null && tries++ < 3);
 
   console.log(
     ` ${usage?.prompt_tokens} tokens ` +
