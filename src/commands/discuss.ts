@@ -18,8 +18,13 @@ const command: Command = {
 
     const { targetMessage: message, channel } = interaction;
 
-    if (!channel) return;
-    if (!("threads" in channel)) return;
+    if (!channel || !("threads" in channel)) {
+      await interaction.reply({
+        content: "抱歉，我似乎沒辦法開啟討論串與您討論。",
+        ephemeral: true,
+      });
+      return;
+    }
 
     interaction.deferReply({ ephemeral: true });
 
