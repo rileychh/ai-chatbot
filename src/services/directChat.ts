@@ -13,7 +13,7 @@ export default async function (message: Message) {
   if (author.id == client.user.id) return; // Don't reply to self
   if (!(channel.isDMBased() || directChannels.has(channel.id))) return;
 
-  channel.sendTyping();
+  await channel.sendTyping();
   const typing = setInterval(async () => {
     await message.channel.sendTyping();
   }, 10000);

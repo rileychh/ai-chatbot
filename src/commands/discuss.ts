@@ -36,12 +36,13 @@ const command: Command = {
         name: "和學長討論",
         startMessage: message.id,
       });
-      getTitle(channel.id, message.content).then((title) => {
-        thread.setName(title);
+      getTitle(channel.id, message.content).then(async (title) => {
+        await thread.setName(title);
+        thread.sendTyping();
       });
     }
 
-    thread.sendTyping();
+    await thread.sendTyping();
     const typing = setInterval(async () => {
       await thread.sendTyping();
     }, 10000);
