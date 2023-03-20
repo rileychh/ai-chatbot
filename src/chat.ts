@@ -98,15 +98,18 @@ export async function chat(
   do {
     error = null;
     try {
-      const completion = await openai.createChatCompletion({
-        model: config.chatModel,
-        messages: [
-          { role: "system", content: config.systemMessage },
-          ...(history ?? []),
-          { role: "user", content: message },
-        ],
-        temperature: 0.7,
-      });
+      const completion = await openai.createChatCompletion(
+        {
+          model: config.chatModel,
+          messages: [
+            { role: "system", content: config.systemMessage },
+            ...(history ?? []),
+            { role: "user", content: message },
+          ],
+          temperature: 0.7,
+        },
+        { timeout: 60000 }
+      );
 
       reply = completion.data.choices[0]?.message?.content ?? null;
       usage = completion.data.usage;
