@@ -129,7 +129,7 @@ export async function getTitle(
   topic: string
 ): Promise<string> {
   return chat(
-    "為這個話題下簡短的標題，只需要回答我標題。 `" + topic + "`",
+    `「${topic}」\n---\n為這個話題下非常簡短的標題，只回答我標題。`,
     channel
   );
 }
