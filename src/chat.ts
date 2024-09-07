@@ -1,24 +1,22 @@
-import { Configuration, OpenAIApi } from "openai";
+import { OpenAI } from "openai";
 import {
   encoding_for_model as encodingForModel,
-  TiktokenModel,
+  TiktokenModel
 } from "@dqbd/tiktoken";
 import { omit } from "lodash";
-import type { ChatCompletionRequestMessage } from "openai";
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import type { Snowflake } from "discord.js";
 import config from "./config";
 import { isAxiosError } from "axios";
 
-interface ChatRecord extends ChatCompletionRequestMessage {
-  id?: Snowflake;
-}
+type ChatRecord = ChatCompletionMessageParam & { id?: Snowflake; }
 
 // A map from channel ID to chat messages.
 class ChatHistory extends Map<Snowflake, ChatRecord[]> {
   getChatCompletionRequestMessage(
     channel: Snowflake
-  ): ChatCompletionRequestMessage[] | undefined {
-    return this.get(channel)?.map((record) => omit(record, "id"));
+  ): ChatCompletionMessageParam[] | undefined {
+    return this.get(channel)?.map((record) => omit(record, "id")) as ChatCompletionMessageParam[] | undefined;
   }
 
   push(channel: Snowflake, entries: ChatRecord[]) {
@@ -36,7 +34,7 @@ class ChatHistory extends Map<Snowflake, ChatRecord[]> {
     }
   }
 
-  // Clears the Chat history for an channel.
+  // Clears the Chat history for a channel.
   // Not called clear because it conflicts with Map#clear.
   reset(channel: Snowflake) {
     const record = this.get(channel);
@@ -74,16 +72,14 @@ class ChatHistory extends Map<Snowflake, ChatRecord[]> {
   }
 }
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
-const openai = new OpenAIApi(configuration);
 export const api = openai;
 
 export const chatHistory = new ChatHistory();
 
 function truncate(string: string, length: number): string {
-  if (typeof string != "string") return string;
   if (string.length > length) return `${string.substring(0, length - 1)}…`;
 
   return string;
@@ -105,21 +101,21 @@ export async function chat(
   do {
     error = null;
     try {
-      const completion = await openai.createChatCompletion(
+      const completion = await openai.chat.completions.create(
         {
           model: config.chatModel,
           messages: [
             { role: "system", content: config.systemMessage },
             ...(history ?? []),
-            { role: "user", content: message },
+            { role: "user", content: message }
           ],
-          temperature: 0.7,
+          temperature: 0.7
         },
         { timeout: 60000 }
       );
 
-      reply = completion.data.choices[0]?.message?.content ?? null;
-      usage = completion.data.usage;
+      reply = completion.choices[0]?.message?.content ?? null;
+      usage = completion.usage;
     } catch (e) {
       error = e;
       if (isAxiosError(e)) {
@@ -134,9 +130,9 @@ export async function chat(
 
   console.log(
     ` ${usage?.prompt_tokens} tokens ` +
-      `-> ${usage?.completion_tokens} tokens ` +
-      `= ${usage?.total_tokens} tokens ` +
-      `in Channel ${channel}`
+    `-> ${usage?.completion_tokens} tokens ` +
+    `= ${usage?.total_tokens} tokens ` +
+    `in Channel ${channel}`
   );
 
   reply = reply ?? "OpenAI 沒有傳回資料，請再試一次。";

@@ -19,7 +19,7 @@ const command: Command = {
     const content = interaction.options.getString("訊息") as string;
     console.log(`Command chat message: ${content}`);
 
-    interaction.deferReply();
+    await interaction.deferReply();
     const reply = await chat(content, interaction.channelId);
 
     // If reply contains math, render the reply into image.
